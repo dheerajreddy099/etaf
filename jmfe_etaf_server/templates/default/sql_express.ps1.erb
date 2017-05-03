@@ -1,0 +1,5 @@
+$app = 'C:\\Softwares\\SQLEXPR_x64_ENU.exe'
+$myarg = '/QUIET /SAPWD="C0mp!ex" /ConfigurationFile="C:\\Softwares\\sql_express.ini" /TCPENABLED="1" /SECURITYMODE="SQL"'
+
+Start-Process $app -ArgumentList $myarg
+Start-Sleep 300

@@ -1,0 +1,21 @@
+{
+  "version": "2",
+  "build_cookbook": {
+    "path": ".delivery/build_cookbook",
+    "name": "build_cookbook"
+  },
+  "skip_phases": ["unit","smoke","provision","functional","deploy"],
+  "build_nodes": {},
+  "dependencies": [],
+  "job_dispatch": {
+    "version": "v2"
+  },
+  "delivery-truck": {
+    "publish": {
+      "chef_server": true,
+      "supermarket": "https://supermarket.jmfamily.com",
+      "supermarket-custom-credentials": "true",
+      "git": "git@git.jmfamily.com:cookbooks/jmfe_etaf_server.git"
+    }
+  }
+}

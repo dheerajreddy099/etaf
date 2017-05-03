@@ -1,0 +1,118 @@
+---
+driver:
+  name: ec2
+  shared_credentials_profile: abc_xyz
+  aws_ssh_key_id: abc_xyz
+  security_group_ids: ["sg-******"]
+  region: us-east-1
+  availability_zone: b
+  require_chef_omnibus: true
+  instance_type: t2.medium
+  iam_profile_name: abc_xyz
+  associate_public_ip: false
+  interface: private
+  subnet_id: subnet-abc2xyz
+  retryable_tries: 200
+  retryable_sleep: 8
+  tags:
+
+provisioner:
+  name: chef_zero
+
+# Now that inspec is the standard, new cookbooks should use it by default
+# Old cookbooks should migrate to inspec.
+verifier:
+  name: inspec
+
+platforms:
+  # The following platforms are available to configure kitchen to run against
+  # within AWS.  Please uncomment all the platforms that the jmfe_etaf_server
+  # should support.
+
+  # The default standard of RHEL 7 and windows-2012 are set as default platforms
+  # that are not commented out.  You may comment platforms that are not needed
+  # for the cookbook.
+  - name: windows-2012
+    transport:
+      username: Administrator
+      ssh_key: <%= ENV['TRANSPORT_SSH_KEY'] %>
+    driver:
+      image_search:
+        owner-id: "233000205727"
+        tag-key: "Kitchen"
+        tag-value: "w12r2baseEncrypted"
+      retryable_tries: 10000
+      retryable_sleep: 30
+      block_device_mappings:
+        - device_name: /dev/sda1
+          ebs:
+            volume_type: gp2
+            volume_size: 100
+            delete_on_termination: true
+        - device_name: /dev/sdb
+          ebs:
+            volume_type: gp2
+            volume_size: 50
+            delete_on_termination: true
+
+  # - name: rhel-7
+  #   transport:
+  #     username: ec2-user
+  #     ssh_key: <%= ENV['TRANSPORT_SSH_KEY'] %>
+  #   driver:
+  #     image_search:
+  #       owner-id: "233000205727"
+  #       tag-key: "Kitchen"
+  #       tag-value: "RHEL72Encrypted"
+
+  # - name: rhel-6
+  #   transport:
+  #     username: ec2-user
+  #     ssh_key: <%= ENV['TRANSPORT_SSH_KEY'] %>
+  #   driver:
+  #     image_search:
+  #       owner-id: "233000205727"
+  #       tag-key: "Kitchen"
+  #       tag-value: "RHEL67Encrypted"
+
+  # - name: windows-2008
+  #  transport:
+  #    username: Administrator
+  #    ssh_key: <%= ENV['TRANSPORT_SSH_KEY'] %>
+  #  driver:
+  #    image_search:
+  #      owner-id: "233000205727"
+  #      tag-key: "Kitchen"
+  #      tag-value: "w08r2baseEncrypted"
+  #    retryable_tries: 10000
+  #    retryable_sleep: 30
+
+  # - name: windows-10
+  #   transport:
+  #     username: Administrator
+  #     ssh_key: <%= ENV['TRANSPORT_SSH_KEY'] %>
+  #   driver:
+  #     image_search:
+  #       owner-id: "233000205727"
+  #       tag-key: "Kitchen"
+  #       tag-value: "windows10Encrypted"
+  #     retryable_tries: 10000
+  #     retryable_sleep: 30
+
+suites:
+  - name: test
+    run_list:
+      - recipe[jmfe_etaf_server::components_setup]
+      - recipe[jmfe_etaf_server::php]
+      - recipe[jmfe_etaf_server::composer_setup]
+      - recipe[jmfe_etaf_server::net_framework]
+      - recipe[jmfe_etaf_server::sql_express]
+      - recipe[jmfe_etaf_server::sql_management_studio]
+      - recipe[jmfe_etaf_server::sql_server_native_client]
+      - recipe[jmfe_etaf_server::webserver_iis]
+      - recipe[jmfe_etaf_server::php_manager_iis]
+      - recipe[jmfe_etaf_server::url_rewrite]
+      - recipe[jmfe_etaf_server::site_install]
+      - recipe[jmfe_etaf_server::deploy_sql_server_module]
+    attributes:
+      DeploymentStage: kitchen
